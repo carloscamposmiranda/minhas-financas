@@ -1,0 +1,67 @@
+version: "3.7"
+
+services:
+  minhasfinancas:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    working_dir: /var/www/
+    volumes:
+      - ./:/var/www
+    networks:
+      - minhas-financas-network
+  # nginx
+  nginx:
+    container_name: srv-nginx
+    image: nginx:alpine
+    restart: unless-stopped
+    ports:
+      - "9000:80"
+    volumes:
+      - ./:/var/www
+      - ./docker/nginx/:/etc/nginx/conf.d/
+    networks:
+      - minhas-financas-network
+  # db mysql ${DB_DATABASE} //Busca do arquivo .env
+  mysql:
+    container_name: financas-mysql
+    image: mysql:5.7.22
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_USER: ${DB_USERNAME}
+    volumes:
+      - ./.docker/mysql/dbdata:/var/lib/mysql
+    ports:
+      - '${FORWARD_DB_PORT:-3307}:3307'
+    networks:
+      - minhas-financas-network
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin-minhasfinancas
+    links:
+      - mysql
+    restart: always
+    environment:
+      - PMA_ARBITRARY=1
+    ports:
+      - 9010:80
+    networks:
+      - minhas-financas-network
+
+networks:
+  minhas-financas-network:
+    driver: bridge
+
+#Doc. de utilizacao
+# para acessar phpmyadmin no navegador: http://localhost:9010/ -  e a porta
+# para acessar nginx(servidor) no navegador: http://localhost:9000/ - e a porta
+
+#PHPMYADMIN info no file
+# servidor: mysql
+# user: root
+# pass: root
