@@ -1,2 +1,2 @@
-# minhas-financas
+# minhasfinancas
 Controle Financeiro Pessoal
