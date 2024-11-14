@@ -1,2 +1,2 @@
 # minhasfinancas
-Controle Financeiro Pessoal - v1.0
+Controle Financeiro Pessoal - v 1.0
